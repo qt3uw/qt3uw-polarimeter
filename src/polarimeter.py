@@ -1,0 +1,66 @@
+from thorlabs_elliptec import ELLx
+import redpitaya_scpi as scpi
+import time
+import numpy as np
+
+class Polarimeter:
+   def __init__(self, p_model, p_serial, qwp_stage, qwp_serial, *args):
+      self.p_stage_model = p_model
+      self.p_stage_serialnumber = p_serial
+      self.qwp_stage_model = qwp_stage 
+      self.qwp_stage_serialnumber = qwp_serial
+      self.theta = 22.5
+      self.n_angles = 8
+      self.pstage = None
+      self.datapoints = 8
+      self.trials = 3
+      self.redpitaya = None
+      self.data = None
+
+   # future built in calibration 
+   # def CalibratePolarizer(self):
+   
+
+
+   # Initializes hardware components to get ready for
+   # data acquisition, must run before running polarimeter
+   def InitializeHardware(self):
+      self.qwp_stage = ELLx(x = self.qwp_stage_model, device_serial = self.qwp_stage_serialnumber)
+      self.qwp_stage.home(blocking = True)
+      # self.qwp_stage.move_relative(62.283, blocking = True)
+      self.qwp_stage.move_relative(63, blocking = True)
+      self.redpitaya = scpi.scpi('128.95.31.27')
+   
+   # Collects, Parses, and Stores Data
+   def runPolarimeter(self):
+      self.data = []
+      for i in range (self.n_angles):
+         # data acquisition
+         self.redpitaya.tx_txt('ACQ:RST')
+         self.redpitaya.tx_txt('ACQ:DATA:UNITS VOLTS')
+         self.redpitaya.tx_txt('ACQ:DEC 1')
+         self.redpitaya.tx_txt('ACQ:START')
+         time.sleep(1)
+         self.redpitaya.tx_txt('ACQ:STOP')
+         self.qwp_stage.move_relative(self.theta)
+         
+         raw_data = self.redpitaya.acq_data(1)
+         
+         # converts output from 
+         # string to a list of floats
+         
+         raw_data = raw_data.replace("{", " ").replace("}", "")
+         raw_data = raw_data.replace("VOLTS\r\n ","         ")
+         raw_data = raw_data.split(",")
+         
+         raw_data_list = []
+
+         for data in raw_data:
+            float_data = float(data)
+            raw_data_list.append(float_data)
+         
+         final_reading = np.average(raw_data_list)
+         self.data.append(final_reading)
+          
+
+      
