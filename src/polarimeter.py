@@ -40,7 +40,7 @@ class Polarimeter:
          self.redpitaya.tx_txt('ACQ:DATA:UNITS VOLTS')
          self.redpitaya.tx_txt('ACQ:DEC 1')
          self.redpitaya.tx_txt('ACQ:START')
-         time.sleep(1)
+         time.sleep(0.5)
          self.redpitaya.tx_txt('ACQ:STOP')
          self.qwp_stage.move_relative(self.theta)
          

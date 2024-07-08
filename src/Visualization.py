@@ -45,7 +45,7 @@ class PolarimeterVisualization:
        
         # applies a filter to smoothen animation when it repeats
         b, a = signal.butter(N=2, Wn=0.1) 
-        self.Efield = signal.filtfilt(b, a, self.eField, axis = 0)
+        self.efield = signal.filtfilt(b, a, self.eField, axis = 0)
 
         self.xs = np.real(self.eField[:, 0] * np.exp(1j * (self.waveVector * self.z)))
         self.ys = np.real(self.eField[:, 1] * np.exp(1j * (self.waveVector * self.z)))
