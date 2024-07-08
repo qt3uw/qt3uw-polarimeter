@@ -10,8 +10,11 @@ data = p.data
 
 da = PolarimeterAnalysis(data)
 da.extract_stokes()
-da.Stokes2Jones()
-vector = da.jones
+da.Stokes2Efield()
+vector = da.eField
+Stokes = [da.S0,da.S1,da.S2,da.S3]
+print(Stokes)
+print(vector)
 # vector = 1/np.sqrt(2) * np.array([1j, 1])
 pv = PolarimeterVisualization(vector)
 pv.pointSetup()

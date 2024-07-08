@@ -3,7 +3,6 @@ import scipy as sp
 
 class PolarimeterAnalysis:
     def __init__(self, input_data):
-        self.x = 1
         self.jones = None
         self.input_data = input_data
         self.data_length = None
@@ -24,9 +23,10 @@ class PolarimeterAnalysis:
             C += self.input_data[i] * np.cos(4*angles[i])
             D += self.input_data[i] * np.sin(4*angles[i])
         
-        B += B*(4/data_length)
-        C += C*(4/data_length)
-        D += D*(4/data_length)
+        A = A*(2/data_length)
+        B = B*(4/data_length)
+        C = C*(4/data_length)
+        D = D*(4/data_length)
 
         self.S0 = A - C
         self.S1 = 2 * C
@@ -37,16 +37,14 @@ class PolarimeterAnalysis:
         self.S1 = self.S1/self.S0
         self.S2 = self.S2/self.S0
         self.S3 = self.S3/self.S0
+        self.S0 = self.S0/self.S0
 
-    def Stokes2Jones(self):
-        self.azimuth = .5 * np.arctan2(self.S2, self.S1)
-        self.elipticity = .5 * np.arcsin(self.S3)
-
-        self.jones = np.array([
-            np.cos(self.elipticity)*np.cos(self.azimuth) - 1j*np.sin(self.elipticity)*np.sin(self.azimuth),
-            np.cos(self.elipticity)*np.sin(self.azimuth) + 1j*np.sin(self.elipticity)*np.cos(self.azimuth)
-            ])
-
+    def Stokes2Efield(self):
+        # self.azimuth = .5 * np.arctan2(self.S2, self.S1)
+        # self.elipticity = .5 * np.arcsin(self.S3)
+        self.Ex = np.sqrt(np.abs(.5 * (self.S0 + self.S1)))
+        self.Ey = np.sqrt(np.abs(.5 * (self.S0 - self.S1)))
+        self.eField = [self.Ex, self.Ey]
 
         
 
