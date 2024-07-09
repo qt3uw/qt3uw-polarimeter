@@ -9,13 +9,12 @@ class Polarimeter:
       self.p_stage_serialnumber = p_serial
       self.qwp_stage_model = qwp_stage 
       self.qwp_stage_serialnumber = qwp_serial
-      self.theta = 22.5
-      self.n_angles = 8
+      # self.theta = 22.5
+      self.n_angles = 12
       self.pstage = None
-      self.datapoints = 8
-      self.trials = 3
       self.redpitaya = None
       self.data = None
+      self.theta = 180/self.n_angles
 
    # future built in calibration 
    # def CalibratePolarizer(self):
@@ -55,10 +54,10 @@ class Polarimeter:
          self.redpitaya.tx_txt('ACQ:DATA:UNITS VOLTS')
          self.redpitaya.tx_txt('ACQ:DEC 1')
          self.redpitaya.tx_txt('ACQ:START')
-         time.sleep(0.5)
+         time.sleep(.5)
          self.redpitaya.tx_txt('ACQ:STOP')
          self.qwp_stage.move_relative(self.theta)
-         
+         time.sleep(.5)
          raw_data = self.redpitaya.acq_data(1)
          
          # converts output from 
@@ -68,6 +67,7 @@ class Polarimeter:
          data = np.average(data)
 
          self.data.append(data)
+      
 
    def MeasureLaserFluctuation(self):
       self.redpitaya.tx_txt('ACQ:RST')

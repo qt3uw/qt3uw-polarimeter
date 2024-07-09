@@ -6,10 +6,10 @@ import time
 
 p = Polarimeter(14,14,14,11400540)
 p.InitializeHardware()
+# p.MeasureLaserFluctuation()
 p.runPolarimeter()
 data = p.data
-time.sleep(1)
-p.MeasureLaserFluctuation()
+# time.sleep(1)
 
 da = PolarimeterAnalysis(data)
 da.extract_stokes()
