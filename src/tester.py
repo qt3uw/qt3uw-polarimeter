@@ -9,6 +9,11 @@ p.InitializeHardware()
 # p.MeasureLaserFluctuation()
 p.runPolarimeter()
 data = p.data
+print(data)
+print(p.theta)
+
+
+
 # time.sleep(1)
 
 da = PolarimeterAnalysis(data)

@@ -13,7 +13,7 @@ class PolarimeterAnalysis:
 
 
     def extract_stokes(self):
-        angles = np.linspace(0,np.deg2rad(180 - 180/12), 12)
+        angles = np.deg2rad(np.linspace(0,180 - 180/8, 8))
         data_length = len(self.input_data)
         # Fourier Coefficients
         # A, B, C, D = (0,0,0,0)
@@ -48,12 +48,41 @@ class PolarimeterAnalysis:
         self.S0 = self.S0/self.S0
 
     def Stokes2Efield(self):
-        # self.azimuth = .5 * np.arctan2(self.S2, self.S1)
-        # self.elipticity = .5 * np.arcsin(self.S3)
-        self.Ex = np.sqrt(.5 * (self.S0 + self.S1 + 0j))
-        # self.Ey = np.sqrt(.5 * (self.S0 - self.S1 + 0j))
-        self.Ey = np.sqrt(0.5 * (self.S0 - self.S1 + 0j)) * np.exp(1j * self.azimuth)
+        self.azimuth = .5 * np.arctan2(self.S2, self.S1)
+        self.elipticity = .5 * np.arcsin(self.S3)
+        self.Ex = np.sqrt(.5 * (self.S0 + self.S1))
+        self.Ey = np.sqrt(.5 * (self.S0 - self.S1))
         self.eField = [self.Ex, self.Ey]
 
         
+    def extract_stokestwo(self):
+        angles = np.linspace(0,np.deg2rad(180 - 180/12), 12)
+        N = len(self.input_data)
+        
+        # Fourier Coefficients
+        A0 = (2 / N) * np.sum(self.input_data)
+        A2 = (4 / N) * np.sum(self.input_data * np.cos(2 * angles))
+        A4 = (4 / N) * np.sum(self.input_data * np.cos(4 * angles))
 
+        # Calculate Stokes Parameters
+        S0 = A0 - A4
+        S1 = 2 * A4
+        S2 = 2 * A2
+        S3 = A2
+
+        # Normalize Stokes Parameters
+        S0_norm = 1
+        S1_norm = S1 / S0
+        S2_norm = S2 / S0
+        S3_norm = S3 / S0
+
+        # Calculate Polarization Parameters
+        psi = 0.5 * np.arctan2(S2, S1)
+        epsilon = 0.5 * np.arcsin(S3 / S0)
+
+        Ex = np.sqrt((S0_norm + S1_norm) / 2 + 0j)
+        Ey = np.sqrt((S0_norm - S1_norm) / 2 + 0j)
+
+        # Calculate phase difference
+        delta = np.arctan2(S3, S2)
+        self.eField = np.array([Ex, Ey * np.exp(1j * delta)])

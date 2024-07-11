@@ -10,7 +10,7 @@ class Polarimeter:
       self.qwp_stage_model = qwp_stage 
       self.qwp_stage_serialnumber = qwp_serial
       # self.theta = 22.5
-      self.n_angles = 12
+      self.n_angles = 8
       self.pstage = None
       self.redpitaya = None
       self.data = None
@@ -26,7 +26,8 @@ class Polarimeter:
    def InitializeHardware(self):
       self.qwp_stage = ELLx(x = self.qwp_stage_model, device_serial = self.qwp_stage_serialnumber)
       self.qwp_stage.home(blocking = True)
-      self.qwp_stage.move_relative(62.283, blocking = True)
+      # self.qwp_stage.move_relative(62.283, blocking = True)
+      self.qwp_stage.move_relative(73.331, blocking = True)
       self.redpitaya = scpi.scpi('128.95.31.27')
    
    # Collects, Parses, and Stores Data
