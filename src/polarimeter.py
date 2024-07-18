@@ -9,30 +9,24 @@ class Polarimeter:
       self.p_stage_serialnumber = p_serial
       self.qwp_stage_model = qwp_stage 
       self.qwp_stage_serialnumber = qwp_serial
-      # self.theta = 22.5
-      self.n_angles = 8
+      self.n_angles = 12
       self.pstage = None
       self.redpitaya = None
       self.data = None
       self.theta = 180/self.n_angles
-
-   # future built in calibration 
-   # def CalibratePolarizer(self):
    
-
 
    # Initializes hardware components to get ready for
    # data acquisition, must run before running polarimeter
    def InitializeHardware(self):
       self.qwp_stage = ELLx(x = self.qwp_stage_model, device_serial = self.qwp_stage_serialnumber)
       self.qwp_stage.home(blocking = True)
-      # self.qwp_stage.move_relative(62.283, blocking = True)
-      self.qwp_stage.move_relative(73.331, blocking = True)
+      self.qwp_stage.move_relative(70.8122, blocking = True)
       self.redpitaya = scpi.scpi('128.95.31.27')
    
-   # Collects, Parses, and Stores Data
+   #  Parses, and Stores Data
 
-   def formatRpData(self, raw_data):
+   def _formatRpData(self, raw_data):
       raw_data = raw_data.replace("{", " ").replace("}", "")
       raw_data = raw_data.replace("VOLTS\r\n ","         ")
       raw_data = raw_data.split(",")
@@ -58,19 +52,19 @@ class Polarimeter:
          time.sleep(.5)
          self.redpitaya.tx_txt('ACQ:STOP')
          self.qwp_stage.move_relative(self.theta)
-         time.sleep(.5)
          raw_data = self.redpitaya.acq_data(1)
          
-         # converts output from 
-         # string to a list of floats
-         
-         data = self.formatRpData(raw_data)
+         # Formats data for processing
+         data = self._formatRpData(raw_data)
          data = np.average(data)
 
          self.data.append(data)
       
 
    def MeasureLaserFluctuation(self):
+      # Takes data at a fixed position 
+      # and prints the range of fluctuation
+      # As a percentage
       self.redpitaya.tx_txt('ACQ:RST')
       self.redpitaya.tx_txt('ACQ:DATA:UNITS VOLTS')
       self.redpitaya.tx_txt('ACQ:DEC 1')
@@ -80,7 +74,7 @@ class Polarimeter:
 
       raw_data = self.redpitaya.acq_data(1)
 
-      data = self.formatRpData(raw_data)
+      data = self._formatRpData(raw_data)
       max = np.max(data)
       min = np.min(data)
 

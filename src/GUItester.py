@@ -99,7 +99,7 @@ class guitester:
             
             _x = xs[frame:frame + N_per_view]
             _y = ys[frame:frame + N_per_view]
-            _z = z[:N_per_view]  # Correct length for the z values
+            _z = z[:N_per_view]  
             
             xcurve.set_data_3d(_x, np.full_like(_x,2), _z)
             ycurve.set_data_3d(np.full_like(_y,-2), _y, _z)
@@ -109,12 +109,13 @@ class guitester:
             # quiver.set_segments([])
 
             quiver.set_segments([np.array([[0, 0, z[i-frame]],[xs[i], ys[i], z[i] - frame]])for i in range(frame, frame+N_per_view, 1)])
-            print("Updating frame:", frame)
+            # print("Updating frame:", frame)
             return ()
 
-        # Directly pass the generator function to FuncAnimation
-        self.ani = FuncAnimation(self.fig, update, interval=1000 / FPS, frames=enumerate(np.arange(N - N_per_view - 1, 0, -1)), repeat=True , blit=False, cache_frame_data=False)
         
+        ani = FuncAnimation(self.fig, update, interval=1000 / FPS, frames=enumerate(np.arange(N - N_per_view - 1, 0, -1)), repeat=True , blit=False, cache_frame_data=False)
+        ani.save("animated.gif")
+        plt.show()
 
     def get_figure(self):
         return self.fig
