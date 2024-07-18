@@ -4,9 +4,9 @@ import time
 import numpy as np
 
 class Polarimeter:
-   def __init__(self, p_model, p_serial, qwp_stage, qwp_serial, *args):
-      self.p_stage_model = p_model
-      self.p_stage_serialnumber = p_serial
+   def __init__(self, pol_stage, pol_serial, qwp_stage, qwp_serial, *args):
+      self.p_stage_model = pol_stage
+      self.p_stage_serialnumber = pol_serial
       self.qwp_stage_model = qwp_stage 
       self.qwp_stage_serialnumber = qwp_serial
       self.n_angles = 12
@@ -14,6 +14,7 @@ class Polarimeter:
       self.redpitaya = None
       self.data = None
       self.theta = 180/self.n_angles
+      
    
 
    # Initializes hardware components to get ready for
@@ -59,7 +60,9 @@ class Polarimeter:
          data = np.average(data)
 
          self.data.append(data)
-      
+   
+   def testfunction(self):
+      print("Your inheritance is working")
 
    def MeasureLaserFluctuation(self):
       # Takes data at a fixed position 
