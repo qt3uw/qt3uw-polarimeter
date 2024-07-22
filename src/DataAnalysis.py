@@ -83,27 +83,27 @@ class PolarimeterAnalysis:
     
     # Stokes to Jones manually 
     def stokes_to_jones(self, S):
-        
-        # Calculate the degree of polarization, not really necesarry
-        # but can serve to check error in system
+        # Calculate the degree of polarization, not really necessary
+        # but can serve to check error in the system
         p = np.sqrt(S[1]**2 + S[2]**2 + S[3]**2) / S[0]
         
         # Calculate the Jones vector components
         A = np.sqrt((1 + S[1]) / 2)
         if A == 0:
-            B = 1
+            B = 1  # B is set to 1 if A is zero to avoid division by zero
         else:
-            B = S / (2 * A) - 1j * S[3] / (2 * A)  # using 1j for the imaginary unit in Python
+            B = (S[2] / (2 * A)) - 1j * (S[3] / (2 * A))  # Ensure B remains a scalar when A is not zero
         
         # Combine them into a vector with the amplitude of the polarized part
-        Jv = np.sqrt(S[0] * p) * np.array([A, B])
+        Jv = np.sqrt(S[0] * p) * np.array([A, B], dtype=complex)  
         
         return Jv
-    
-    # Stokes to Jones using py_pol package
+
     # Takes in Stokes parameters as a list 
     def StokestoJonesTwo(self, S):
         E = Jones_vector("Source 1")
+        print("is this even working")
         stokes = Stokes().from_components(S)
-        jv = E.from_Stokes(stokes)
-        print(jv)
+        self.jv = E.from_Stokes(stokes)
+        print(self.jv)
+        # return self.jv

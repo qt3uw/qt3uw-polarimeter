@@ -3,6 +3,8 @@ import redpitaya_scpi as scpi
 import time
 import numpy as np
 
+class PhotodiodeOversaturationError(Exception):
+   pass
 class Polarimeter:
    def __init__(self, pol_stage, pol_serial, qwp_stage, qwp_serial, *args):
       self.p_stage_model = pol_stage
@@ -48,6 +50,7 @@ class Polarimeter:
          # data acquisition
          self.redpitaya.tx_txt('ACQ:RST')
          self.redpitaya.tx_txt('ACQ:DATA:UNITS VOLTS')
+         self.redpitaya.tx_txt('ACQ:SOUR1:GAIN HV')
          self.redpitaya.tx_txt('ACQ:DEC 1')
          self.redpitaya.tx_txt('ACQ:START')
          time.sleep(.5)
@@ -57,12 +60,19 @@ class Polarimeter:
          
          # Formats data for processing
          data = self._formatRpData(raw_data)
+         for item in data:
+            self.check_for_oversaturation(item)
+            
          data = np.average(data)
 
          self.data.append(data)
    
    def testfunction(self):
       print("Your inheritance is working")
+
+   def check_for_oversaturation(self,output_voltage):
+      if output_voltage >= 10.0:
+         raise PhotodiodeOversaturationError(f"Photodiode signal is oversaturated")
 
    def MeasureLaserFluctuation(self):
       # Takes data at a fixed position 
