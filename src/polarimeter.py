@@ -66,8 +66,9 @@ class Polarimeter:
          data = np.average(data)
 
          self.data.append(data)
-      self.qwp_stage.home(blocking=True)
-      self.qwp_stage.move_relative(71.7372, blocking=True)
+      # self.qwp_stage.home(blocking=True)
+      time.sleep(0.1)
+      self.qwp_stage.move_absolute(71.7372, blocking=True)
    
    def testfunction(self):
       print("Your inheritance is working")

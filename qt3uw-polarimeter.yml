@@ -1,0 +1,17 @@
+name: qt3uw-polarimeter
+
+channels:
+  - default
+  - conda-forge
+
+dependencies:
+  - python>3.11
+  - numpy
+  - matplotlib
+  - scipy
+  - pip
+  - pip:
+    - customtkinter
+    - Pillow
+    - tkinter
+    - thorlabs-elliptec
