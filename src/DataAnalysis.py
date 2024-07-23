@@ -18,7 +18,8 @@ class PolarimeterAnalysis:
         angles = np.deg2rad(np.linspace(0,180 - 180/12, 12))
         data_length = len(self.input_data)
         # Fourier Coefficients Computation 
-
+        print(f"list of angles {np.rad2deg(angles)}")
+        print(f"data length = {data_length}")
         A = (2/data_length) * np.sum(self.input_data)
         B = (4/data_length) * np.sum(self.input_data * np.sin(2 * angles))
         C = (4/data_length) * np.sum(self.input_data * np.cos(4 * angles))
@@ -84,7 +85,7 @@ class PolarimeterAnalysis:
     # Stokes to Jones manually 
     def stokes_to_jones(self, S):
         # Calculate the degree of polarization, not really necessary
-        # but can serve to check error in the system
+        # but can serve to check error 
         p = np.sqrt(S[1]**2 + S[2]**2 + S[3]**2) / S[0]
         
         # Calculate the Jones vector components
