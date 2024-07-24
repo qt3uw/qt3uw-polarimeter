@@ -20,9 +20,14 @@ class plotting:
         self.lines = []
 
         # Create Update Button
-        self.ax_button = plt.axes([.8, .05, .1, .075])
+        self.ax_button = plt.axes([.9, .05, .1, .075])
         self.button = Button(self.ax_button, 'Update')
         self.button.on_clicked(self.update_plot)
+
+        # Create Clear Button
+        self.clear_button = plt.axes([.9, .15, .1, .075])
+        self.clear_button = Button(self.clear_button,'Clear')
+        self.clear_button.on_clicked(self.clear_plot)
 
         # init hardware
         self.D = Driver.driver()
@@ -52,7 +57,14 @@ class plotting:
         self.fig.canvas.draw_idle()
         
 
-    
+    def clear_plot(self, event):
+        for line in self.lines:
+            line.remove()
+        self.lines.clear()
+        
+        # Redraw the canvas
+        self.fig.canvas.draw_idle()
+
     def getData(self):
         self.D.collect_data()
         self.D.analyze_data()
@@ -60,7 +72,7 @@ class plotting:
         return self.D.jones_vector
 
     def plot_polarization(self, Ex, Ey):
-        
+            
         # thetas = np.rad2deg(thetas)
         Ex = Ex
         Ey = Ey
