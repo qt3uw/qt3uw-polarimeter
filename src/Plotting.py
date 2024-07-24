@@ -36,14 +36,14 @@ class plotting:
         self.lines.append(line)
 
     def update_plot(self, event):
-        # Grayscale Gradient
+        
         t = np.linspace(0, 2*np.pi, 180)
         Ex, Ey = self.getData()
         Ex = Ex.real * np.cos(t) - Ex.imag * np.sin(t)
         Ey = Ey.real * np.cos(t) - Ey.imag * np.sin(t)
         for line in self.lines:
             color = np.array(mcolors.to_rgba(line.get_color()))
-            color[-1] *= .6
+            color[-1] *= .5
             line.set_color(color)
         
         new_line, = self.ax.plot(Ex, Ey, lw=2, color='black')
@@ -59,27 +59,21 @@ class plotting:
 
         return self.D.jones_vector
 
-    def plot_polarization(self, thetas, vectors):
-        # Grayscale Gradient
-
+    def plot_polarization(self, Ex, Ey):
         
         # thetas = np.rad2deg(thetas)
-        E_out = vectors
+        Ex = Ex
+        Ey = Ey
         t = np.linspace(0, 2*np.pi, 180)
 
-        if type(vectors) == list:
-            for theta, vector in zip(thetas, vectors):
-                Ex = vector[0].real * np.cos(t) - vector[0].imag * np.sin(t)
-                Ey = vector[1].real * np.cos(t) - vector[1].imag * np.sin(t)
-
-        else:
-            Ex = vectors[0].real * np.cos(t) - vectors[0].imag * np.sin(t)
-            Ey = vectors[1].real * np.cos(t) - vectors[1].imag * np.sin(t)
+        Ex = Ex.real * np.cos(t) - Ex.imag * np.sin(t)
+        Ey = Ey.real * np.cos(t) - Ey.imag * np.sin(t)
 
         self.fig, self.ax = plt.subplots(1, 1, figsize=(5,3))
 
         self.ax.plot(Ex, Ey)
-        # ax.set_title(f'QWP at {thetas}°')
+        self.ax.set_title(f'polarization')
+        plt.show()
         
     def jones_vector(theta):
         # Initial horizontal polarization

@@ -10,23 +10,29 @@ class driver:
     def __init__(self):
         self.p = Polarimeter(14,14,14,11400540)
         self.p.InitializeHardware()
-    
+        # self.random = t.plotting()
     def collect_data(self):  
         # p.MeasureLaserFluctuation()
-        self.p.runPolarimeter()
+        self.p.runPolarimeter(15)
         self.data = self.p.data
     # Polarimeter
     
     def analyze_data(self):
         da = PolarimeterAnalysis(self.data)
         da.extract_stokes()
-        da.Stokes2Efield()
+        # da.Stokes2Efield()
         self.Stokes = [da.S0,da.S1,da.S2,da.S3]
         self.jones_vector = da.stokes_to_jones(self.Stokes)
         print(self.jones_vector)
-        # t.plot_polarization(0,jones_vector)
+        Ex, Ey = self.jones_vector[0], self.jones_vector[1]
+        # self.random.plot_polarization(Ex, Ey)
+        
     
-    
+if __name__ == "__main__":
+    d = driver()
+    # d.collect_data()
+    # d.analyze_data()
+    d.p.MeasureLaserFluctuation()
     #gets Jones Vector 
     
 

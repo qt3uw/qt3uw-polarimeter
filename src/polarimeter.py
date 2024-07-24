@@ -11,7 +11,7 @@ class Polarimeter:
       self.p_stage_serialnumber = pol_serial
       self.qwp_stage_model = qwp_stage 
       self.qwp_stage_serialnumber = qwp_serial
-      self.n_angles = 12
+      self.n_angles = 200
       self.pstage = None
       self.redpitaya = None
       self.data = None
@@ -23,8 +23,8 @@ class Polarimeter:
    # data acquisition, must run before running polarimeter
    def InitializeHardware(self):
       self.qwp_stage = ELLx(x = self.qwp_stage_model, device_serial = self.qwp_stage_serialnumber)
-      self.qwp_stage.home(blocking = True)
-      self.qwp_stage.move_relative(71.7372, blocking = True)
+      self.qwp_stage.home()
+      self.qwp_stage.move_relative(71.55565556555656, blocking = True)
       self.redpitaya = scpi.scpi('128.95.31.27')
    
    #  Parses, and Stores Data
@@ -44,22 +44,26 @@ class Polarimeter:
       
       return raw_data_list
 
-   def runPolarimeter(self):
+   def getData(self,theta):
+      self.redpitaya.tx_txt('ACQ:RST')
+      self.redpitaya.tx_txt('ACQ:DATA:UNITS VOLTS')
+      self.redpitaya.tx_txt('ACQ:SOUR1:GAIN HV')
+      self.redpitaya.tx_txt('ACQ:DEC 1')
+      self.redpitaya.tx_txt('ACQ:START')
+      time.sleep(.2)
+      self.redpitaya.tx_txt('ACQ:STOP')
+      self.qwp_stage.move_relative(theta)
+      self.raw_data = self.redpitaya.acq_data(1)
+      return self.raw_data
+   
+   def runPolarimeter(self, n_angles):
       self.data = []
-      for i in range (self.n_angles):
+      for i in range (n_angles):
          # data acquisition
-         self.redpitaya.tx_txt('ACQ:RST')
-         self.redpitaya.tx_txt('ACQ:DATA:UNITS VOLTS')
-         self.redpitaya.tx_txt('ACQ:SOUR1:GAIN HV')
-         self.redpitaya.tx_txt('ACQ:DEC 1')
-         self.redpitaya.tx_txt('ACQ:START')
-         time.sleep(.5)
-         self.redpitaya.tx_txt('ACQ:STOP')
-         self.qwp_stage.move_relative(self.theta)
-         raw_data = self.redpitaya.acq_data(1)
-         
+         self.getData(180/n_angles)
+
          # Formats data for processing
-         data = self._formatRpData(raw_data)
+         data = self._formatRpData(self.raw_data)
          for item in data:
             self.check_for_oversaturation(item)
             
@@ -67,8 +71,9 @@ class Polarimeter:
 
          self.data.append(data)
       # self.qwp_stage.home(blocking=True)
-      time.sleep(0.1)
-      self.qwp_stage.move_absolute(71.7372, blocking=True)
+      time.sleep(0.2)
+      self.qwp_stage.home(blocking = True)
+      self.qwp_stage.move_absolute(71.556, blocking=True)
    
    def testfunction(self):
       print("Your inheritance is working")

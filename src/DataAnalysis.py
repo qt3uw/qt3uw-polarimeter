@@ -15,7 +15,7 @@ class PolarimeterAnalysis:
 
 
     def extract_stokes(self):
-        angles = np.deg2rad(np.linspace(0,180 - 180/12, 12))
+        angles = np.deg2rad(np.linspace(0,180 - 180/15,15))
         data_length = len(self.input_data)
         # Fourier Coefficients Computation 
         print(f"list of angles {np.rad2deg(angles)}")
@@ -79,7 +79,7 @@ class PolarimeterAnalysis:
 
         # Calculate phase difference
         delta = np.arctan2(S3, S2)
-        self.eFieldvector = np.array([self.Ex, self.Ey * np.exp(1j * psi)])
+        self.eFieldvector = np.array([self.Ex, self.Ey * np.exp(1j * delta)])
 
     
     # Stokes to Jones manually 
@@ -97,7 +97,7 @@ class PolarimeterAnalysis:
         
         # Combine them into a vector with the amplitude of the polarized part
         Jv = np.sqrt(S[0] * p) * np.array([A, B], dtype=complex)  
-        
+        print(p)
         return Jv
 
     # Takes in Stokes parameters as a list 
