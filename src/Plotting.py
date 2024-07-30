@@ -29,6 +29,13 @@ class plotting:
         self.clear_button = Button(self.clear_button,'Clear')
         self.clear_button.on_clicked(self.clear_plot)
 
+        # Create avg button
+        self.avg_button = plt.axes([.9, .25, .1, .075])
+        self.avg_button = Button(self.avg_button, 'Average')
+        self.avg_button.on_clicked(self.average_plot)
+
+
+
         # init hardware
         self.D = Driver.driver()
 
@@ -56,12 +63,51 @@ class plotting:
 
         self.fig.canvas.draw_idle()
         
+    def average_plot(self, event):
+        if not self.lines:
+            return
+        
+        # Initialize lists to store all x and y data points
+        all_x_data = []
+        all_y_data = []
+        
+        # Collect all x and y data points from the lines
+        for line in self.lines:
+            x_data = line.get_xdata()
+            y_data = line.get_ydata()
+            all_x_data.append(x_data)
+            all_y_data.append(y_data)
+        
+        # Convert to numpy arrays for easier manipulation
+        all_x_data = np.array(all_x_data)
+        all_y_data = np.array(all_y_data)
+        
+        # Calculate the average x and y values
+        avg_x = np.mean(all_x_data, axis=0)
+        avg_y = np.mean(all_y_data, axis=0)
+        
+        # Clear the plot
+        self.clear_plot(None)
+        
+        # Plot the average line as a regular line
+        avg_line, = self.ax.plot(avg_x, avg_y, color='red')
+        
+        # Add the average line to the list of lines
+        self.lines.append(avg_line)
+        
+        # Debugging output to verify adding the average line
+        print("Added average line.")
+        
+        # Redraw the canvas
+        self.fig.canvas.draw_idle()
+
+        
+
 
     def clear_plot(self, event):
-        for line in self.lines:
+        while self.lines:
+            line = self.lines.pop()
             line.remove()
-        self.lines.clear()
-        
         # Redraw the canvas
         self.fig.canvas.draw_idle()
 
