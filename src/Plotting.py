@@ -95,9 +95,6 @@ class plotting:
         # Add the average line to the list of lines
         self.lines.append(avg_line)
         
-        # Debugging output to verify adding the average line
-        print("Added average line.")
-        
         # Redraw the canvas
         self.fig.canvas.draw_idle()
 
