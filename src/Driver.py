@@ -9,8 +9,27 @@ import RetardanceModel as rm
 class driver:
     def __init__(self):
         self.p = Polarimeter(14,14,14,11400540)
-        self.p.InitializeHardware()
+        self.Ex = None
+        self.Ey = None
+        # self.p.InitializeHardware()
         # self.random = t.plotting()
+        
+
+    def main(self):
+        
+        self.p.runPolarimeter(15)
+        self.data = self.p.data
+        da = PolarimeterAnalysis(self.data)
+        da.extract_stokes()
+        # da.Stokes2Efield()
+        self.Stokes = [da.S0,da.S1,da.S2,da.S3]
+        self.jones_vector = da.stokes_to_jones(self.Stokes)
+        print(self.jones_vector)
+        self.Ex, self.Ey = self.jones_vector[0], self.jones_vector[1]
+        # self.random.plot_polarization(Ex, Ey)
+        
+        
+
     def collect_data(self):  
         # p.MeasureLaserFluctuation()
         self.p.runPolarimeter(15)

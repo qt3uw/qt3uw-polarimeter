@@ -6,14 +6,14 @@ import numpy as np
 class PhotodiodeOversaturationError(Exception):
    pass
 class Polarimeter:
-   def __init__(self, pol_stage, pol_serial, qwp_stage, qwp_serial, *args):
+   def __init__(self, pol_stage, pol_serial, qwp_stage, qwp_serial):
       self.p_stage_model = pol_stage
       self.p_stage_serialnumber = pol_serial
       self.qwp_stage_model = qwp_stage 
       self.qwp_stage_serialnumber = qwp_serial
       self.n_angles = 200
       self.pstage = None
-      self.redpitaya = None
+
       self.data = None
       self.theta = 180/self.n_angles
       

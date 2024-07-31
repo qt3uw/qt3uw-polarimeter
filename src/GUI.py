@@ -6,8 +6,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from PIL import Image, ImageTk
 import time
-from scraptest import tester
-from Visualization import PolarimeterVisualization
+import Plotting
+import polarimeter
+import DataAnalysis
+import Driver
+
 
 class Redirect:
     def __init__(self, root):
@@ -17,6 +20,8 @@ class Redirect:
         self.widget.insert(ctk.END, string)
         self.widget.see(ctk.END)  
 
+def clear_text():
+    textarea.delete("1.0", ctk.END)
 # class MyApp(tk.Frame):
     
 #     def __init__(self, root):
@@ -103,12 +108,36 @@ class Redirect:
 #         )
 
 
-gui = guitester()
-t = tester()
+# t = tester()
 # gui.visualization()
 
 # Create root window
+# p = polarimeter.Polarimeter(14,14,14,11400540)
+plotting = Plotting.plotting()
+# d = Driver.driver()
 window = ctk.CTk()
+textarea = ctk.CTkTextbox(window, width = 500, height = 200, fg_color = "#2e2e2e", text_color ='white')
+textarea.place(x= 300, y = 300)
+
+plot_frame = ctk.CTkFrame(window)
+label = ctk.CTkLabel(text = "Polarization Plot", master = plot_frame)
+label.pack()
+
+
+widget_frame = ctk.CTkScrollableFrame(window, width = 250 , height = 500)
+widget_label = ctk.CTkLabel(text = 'ACTION', master = widget_frame)
+widget_frame.place(x=0,y=0)
+
+# widget_scrollbar =
+
+
+canvas = FigureCanvasTkAgg(plotting.fig, master = plot_frame)
+canvas.get_tk_widget().pack()
+plot_frame.place(x = 300, y = 0)
+
+sys.stdout = Redirect(textarea)
+gui = guitester()
+
 # app = MyApp(root = tk.Tk())
 
 window.title('Polarimeter app')
@@ -116,68 +145,98 @@ window.geometry('800x500')
 ctk.set_appearance_mode('dark')
 
 label = ctk.CTkLabel(
-    window, 
+    widget_frame, 
     text = 'ACTIONS', 
     height=50,
     width=200,
     fg_color = 'transparent',
     text_color = ('black', 'white'))
 
-label.place(x=50, y=50)
+label.pack(pady=11)
 
 
-initbutton = ctk.CTkButton(window, 
-                       text = 'Initialize Hardware', 
-                       fg_color = 'light blue', 
-                       text_color = 'black', 
-                       height=50,
-                       width=200,
-                       command = gui.Initialize_hardware,
-                    #    command = t.init_hardware,
-                       corner_radius=50)
-initbutton.place(x=50,y=100)
+# initbutton = ctk.CTkButton(widget_frame, 
+#                        text = 'Initialize Hardware', 
+#                        fg_color = 'light blue', 
+#                        text_color = 'black', 
+#                        height=50,
+#                        width=200,
+#                        command = lambda: plotting.D.p.InitializeHardware(),
+#                     #    command = t.init_hardware,
+#                        corner_radius=50)
+# initbutton.place(x=50,y=100)
+
+initbutton = ctk.CTkButton(widget_frame,
+                           text='Initialize Hardware',
+                           fg_color='light blue',
+                           text_color='black',
+                           height=50,
+                           width=200,
+                           command=lambda: plotting.D.p.InitializeHardware(),
+                           corner_radius=50)
+initbutton.pack(pady=15)
 
 
-flucbutton = ctk.CTkButton(window,
-                           text = 'laser fluctuation',
+plotbutton = ctk.CTkButton(widget_frame,
+                           text = 'update plot',
                            fg_color = 'light blue', 
                            text_color = 'black', 
                            height=50,
                            width=200,
-                           command = gui.measurerange,
+                           command = lambda: plotting.update_plot(),
                         #    command = t.measurelaser,
                            corner_radius=50)
-flucbutton.place(x=50, y=300)
+plotbutton.pack(pady=15)
 
-calibrationbutton = ctk.CTkButton(window,
-                                  text = 'QWP Calibration',
+calibrationbutton = ctk.CTkButton(widget_frame,
+                                  text = 'Clear Plot',
                                   fg_color = 'light blue',
                                   text_color = 'black',
                                   height = 50,
                                   width = 200,
-                                  command = print("this button works"),
+                                  command = lambda: plotting.clear_plot(),
                                   corner_radius=50)
 
-calibrationbutton.place(x=50,y=400)
+calibrationbutton.pack(pady = 15)
 
 
-runbutton = ctk.CTkButton(window,
-                          text = 'Measure POL State',
+runbutton = ctk.CTkButton(widget_frame,
+                          text = 'Average Plot',
                           fg_color = 'light blue', 
                           text_color = 'black', 
                           height=50,
                           width=200,
-                          command = gui.run_polarimeter,
+                          command = lambda: plotting.average_plot(),
                         #   command = t.run_p,
                           corner_radius=50
                           )
 
-runbutton.place(x=50, y=200)
+runbutton.pack(pady=15)
+
+mainbutton = ctk.CTkButton(widget_frame, 
+                              text = 'Collect Data',
+                              fg_color = 'light blue',
+                              text_color = 'black',
+                              height = 50,
+                              width = 200,
+                              command = lambda: plotting.D.main(),
+                              corner_radius = 50)
+
+mainbutton.pack(pady=15)
+
+clear_text_button = ctk.CTkButton(widget_frame,
+                                  text = 'Clear Text',
+                                  fg_color= 'light blue',
+                                  text_color='black',
+                                  height=50,
+                                  width=200,
+                                  command=lambda:clear_text(),
+                                  corner_radius=500)
+
+clear_text_button.pack(pady=15)
 
 
 
-textarea = ctk.CTkTextbox(window, width = 500, height = 200, fg_color = "#2e2e2e", text_color ='white')
-textarea.place(x= 300, y = 300)
 
 
 # Animation is broken
@@ -188,7 +247,7 @@ textarea.place(x= 300, y = 300)
 
 
 
-sys.stdout = Redirect(textarea)
+
 
 window.mainloop()
 sys.stdout = sys.__stdout__
