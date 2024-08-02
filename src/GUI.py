@@ -10,6 +10,7 @@ import Plotting
 import polarimeter
 import DataAnalysis
 import Driver
+import Calibration
 
 
 class Redirect:
@@ -19,9 +20,102 @@ class Redirect:
     def write(self, string):
         self.widget.insert(ctk.END, string)
         self.widget.see(ctk.END)  
+    
+    # def flush(self):
+    #     pass
+
+def get_user_input():
+    global user_input
+    input_dialog = ctk.CTkToplevel(window)
+    input_dialog.title("Input")
+    input_dialog.geometry("300x150")
+
+    label = ctk.CTkLabel(input_dialog, text="Enter your name:")
+    label.pack(pady=10)
+
+    entry = ctk.CTkEntry(input_dialog)
+    entry.pack(pady=5)
+
+    def on_submit():
+        global user_input
+        user_input = entry.get()
+        if user_input:
+            print(f"User input: {user_input}")
+        input_dialog.destroy()
+
+    submit_button = ctk.CTkButton(input_dialog, text="Submit", command=on_submit)
+    submit_button.pack(pady=10)
+    # input_dialog.transient() needs to be in a class to properly manipulate 
+
+def print_user_input():
+    global user_input
+    print(f"user input: {user_input}")
+
+
 
 def clear_text():
     textarea.delete("1.0", ctk.END)
+
+def open_calibration_window():
+    calib_window = ctk.CTkToplevel(window)
+    calib_window.title("Calibration Instructions")
+    calib_window.geometry("800x500")
+
+    frame = ctk.CTkFrame(calib_window)
+    frame.pack(pady=20, padx=20, fill='x', expand=True,anchor = "n")
+
+
+    instructions = ctk.CTkLabel(frame, font=("Helvetica", 12),text = "CALIBRATION INSTRUCTIONS\n1. Mount horizontally aligned beam splitter or polarizer in front of laser\n 2. Leave only Rotator Mount with Polarizer on System then click begin\n **After each run it will give the calibrated angle.**\nUse the polarizer\n adjustment tool to move polarizer to the calibrated angle then leave it there**\n3.Add QWP + rotator mount back and press start\n**Now you can either hardcode this value into\n the update angle button to update this value**")
+    # instructions.pack(pady=10, anchor="nw")
+    
+
+    Polarizer_calibration_button = ctk.CTkButton(frame, 
+                                                 text = "Polarizer Calibration Start", 
+                                                 fg_color='light blue', 
+                                                 text_color='black',
+                                                 height=50, 
+                                                 width = 200, 
+                                                 corner_radius=50, 
+                                                 command=lambda: print("polarizer calibration"))
+    # Polarizer_calibration_button.grid(row= 1, column = 1)
+
+    QWP_calibration_button = ctk.CTkButton(frame,
+                                           text = "QWP Calibration Start", 
+                                           fg_color='light blue', 
+                                           text_color='black',
+                                           height=50, 
+                                           width = 200, 
+                                           corner_radius=50, 
+                                           command= plotting.D.p.qwpCalibration)
+    
+    adjustpolarizermountbutton = ctk.CTkButton(frame,
+                                               text= 'adjust polarizer cal',
+                                               fg_color='light blue',
+                                               text_color='black',
+                                               height = 50,
+                                               width = 200,
+                                               corner_radius = 50,
+                                               command= lambda: print_user_input()
+                                               )
+    
+    updateqwpanglebutton = ctk.CTkButton(frame,
+                                        text= 'adjust QWP cal',
+                                        fg_color='light blue',
+                                        text_color='black',
+                                        height = 50,
+                                        width = 200,
+                                        corner_radius = 50,
+                                        command= lambda: print("updated!")
+                                        )
+
+    instructions.pack(pady=10, anchor="n")
+    Polarizer_calibration_button.pack(pady=10, anchor="n")
+    QWP_calibration_button.pack(pady=10,anchor = "n")
+    adjustpolarizermountbutton.pack(pady=10, anchor = "n")
+    updateqwpanglebutton.pack(pady=10, anchor = "n")
+    calib_window.transient(window)
+    calib_window.lift()
+    # calib_window.focus_force()
 # class MyApp(tk.Frame):
     
 #     def __init__(self, root):
@@ -110,7 +204,7 @@ def clear_text():
 
 # t = tester()
 # gui.visualization()
-
+# cal = Calibration.calibration() 
 # Create root window
 # p = polarimeter.Polarimeter(14,14,14,11400540)
 plotting = Plotting.plotting()
@@ -136,6 +230,7 @@ canvas.get_tk_widget().pack()
 plot_frame.place(x = 300, y = 0)
 
 sys.stdout = Redirect(textarea)
+sys.stderr = Redirect(textarea)
 gui = guitester()
 
 # app = MyApp(root = tk.Tk())
@@ -188,7 +283,7 @@ plotbutton = ctk.CTkButton(widget_frame,
                            corner_radius=50)
 plotbutton.pack(pady=15)
 
-calibrationbutton = ctk.CTkButton(widget_frame,
+clearbutton = ctk.CTkButton(widget_frame,
                                   text = 'Clear Plot',
                                   fg_color = 'light blue',
                                   text_color = 'black',
@@ -197,7 +292,7 @@ calibrationbutton = ctk.CTkButton(widget_frame,
                                   command = lambda: plotting.clear_plot(),
                                   corner_radius=50)
 
-calibrationbutton.pack(pady = 15)
+clearbutton.pack(pady = 15)
 
 
 runbutton = ctk.CTkButton(widget_frame,
@@ -235,8 +330,17 @@ clear_text_button = ctk.CTkButton(widget_frame,
 
 clear_text_button.pack(pady=15)
 
+calibration_button = ctk.CTkButton(widget_frame,
+                                   text = 'Calibration',
+                                   fg_color='light blue',
+                                   text_color='black',
+                                   height = 50,
+                                   width = 200,
+                                #    command = lambda: print("Calibration Button"),
+                                   command = open_calibration_window,
+                                   corner_radius=50)
 
-
+calibration_button.pack(pady=15)
 
 
 # Animation is broken
@@ -251,3 +355,4 @@ clear_text_button.pack(pady=15)
 
 window.mainloop()
 sys.stdout = sys.__stdout__
+sys.stderr = sys.__stderr__

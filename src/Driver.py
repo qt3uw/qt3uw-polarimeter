@@ -8,7 +8,8 @@ import RetardanceModel as rm
 
 class driver:
     def __init__(self):
-        self.p = Polarimeter(14,14,14,11400540)
+        self.p = Polarimeter(14,11400938,14,11400540)
+        # self.p.InitializeHardware()
         self.Ex = None
         self.Ey = None
         # self.p.InitializeHardware()
@@ -24,7 +25,7 @@ class driver:
         # da.Stokes2Efield()
         self.Stokes = [da.S0,da.S1,da.S2,da.S3]
         self.jones_vector = da.stokes_to_jones(self.Stokes)
-        print(self.jones_vector)
+        # print(self.jones_vector)
         self.Ex, self.Ey = self.jones_vector[0], self.jones_vector[1]
         # self.random.plot_polarization(Ex, Ey)
         
@@ -48,10 +49,10 @@ class driver:
         
     
 if __name__ == "__main__":
-    d = driver()
+    # d = driver()
     # d.collect_data()
     # d.analyze_data()
-    d.p.MeasureLaserFluctuation()
+    # d.p.MeasureLaserFluctuation()
     #gets Jones Vector 
     
 
@@ -62,7 +63,7 @@ if __name__ == "__main__":
 
 
     # vector = 1/np.sqrt(2) * np.array([1j, 1])
-    # pv = PolarimeterVisualization(jones_vector)  
-    # pv.pointSetup()
-    # pv.plotSetup()
-    # pv.animate()
+    pv = PolarimeterVisualization(d.jones_vector)  
+    pv.pointSetup()
+    pv.plotSetup()
+    pv.animate()

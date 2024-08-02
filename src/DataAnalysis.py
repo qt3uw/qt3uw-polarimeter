@@ -19,7 +19,7 @@ class PolarimeterAnalysis:
         data_length = len(self.input_data)
         # Fourier Coefficients Computation 
         print(f"list of angles {np.rad2deg(angles)}")
-        print(f"data length = {data_length}")
+        # print(f"data length = {data_length}")
         A = (2/data_length) * np.sum(self.input_data)
         B = (4/data_length) * np.sum(self.input_data * np.sin(2 * angles))
         C = (4/data_length) * np.sum(self.input_data * np.cos(4 * angles))
@@ -48,38 +48,38 @@ class PolarimeterAnalysis:
     
 
 
-    # Alternative test computations
-    def extract_stokestwo(self):
-        angles = np.linspace(0,np.deg2rad(180 - 180/12), 12)
-        N = len(self.input_data)
+    # # Alternative test computations
+    # def extract_stokestwo(self):
+    #     angles = np.linspace(0,np.deg2rad(180 - 180/12), 12)
+    #     N = len(self.input_data)
         
-        # Fourier Coefficients
-        A0 = (2 / N) * (np.sum(self.input_data))
-        A2 = (4 / N) * (np.sum(self.input_data * np.cos(2 * angles)))
-        A4 = (4 / N) * (np.sum(self.input_data * np.cos(4 * angles)))
+    #     # Fourier Coefficients
+    #     A0 = (2 / N) * (np.sum(self.input_data))
+    #     A2 = (4 / N) * (np.sum(self.input_data * np.cos(2 * angles)))
+    #     A4 = (4 / N) * (np.sum(self.input_data * np.cos(4 * angles)))
 
-        # Calculate Stokes Parameters
-        S0 = A0 - A4
-        S1 = 2 * A4
-        S2 = 2 * A2
-        S3 = A2
+    #     # Calculate Stokes Parameters
+    #     S0 = A0 - A4
+    #     S1 = 2 * A4
+    #     S2 = 2 * A2
+    #     S3 = A2
 
-        # Normalize Stokes Parameters
-        S0_norm = 1
-        S1_norm = S1 / S0
-        S2_norm = S2 / S0
-        S3_norm = S3 / S0
+    #     # Normalize Stokes Parameters
+    #     S0_norm = 1
+    #     S1_norm = S1 / S0
+    #     S2_norm = S2 / S0
+    #     S3_norm = S3 / S0
 
-        # Calculate Polarization Parameters
-        psi = 0.5 * np.arctan2(S2, S1)
-        epsilon = 0.5 * np.arcsin(S3 / S0)
+    #     # Calculate Polarization Parameters
+    #     psi = 0.5 * np.arctan2(S2, S1)
+    #     epsilon = 0.5 * np.arcsin(S3 / S0)
 
-        self.Ex = np.sqrt((S0_norm + S1_norm) / 2 + 0j)
-        self.Ey = np.sqrt((S0_norm - S1_norm) / 2 + 0j)
+    #     self.Ex = np.sqrt((S0_norm + S1_norm) / 2 + 0j)
+    #     self.Ey = np.sqrt((S0_norm - S1_norm) / 2 + 0j)
 
-        # Calculate phase difference
-        delta = np.arctan2(S3, S2)
-        self.eFieldvector = np.array([self.Ex, self.Ey * np.exp(1j * delta)])
+    #     # Calculate phase difference
+    #     delta = np.arctan2(S3, S2)
+    #     self.eFieldvector = np.array([self.Ex, self.Ey * np.exp(1j * delta)])
 
     
     # Stokes to Jones manually 
@@ -97,14 +97,14 @@ class PolarimeterAnalysis:
         
         # Combine them into a vector with the amplitude of the polarized part
         Jv = np.sqrt(S[0] * p) * np.array([A, B], dtype=complex)  
-        print(p)
+        # print(p)
         return Jv
 
-    # Takes in Stokes parameters as a list 
-    def StokestoJonesTwo(self, S):
-        E = Jones_vector("Source 1")
-        print("is this even working")
-        stokes = Stokes().from_components(S)
-        self.jv = E.from_Stokes(stokes)
-        print(self.jv)
-        # return self.jv
+    # # Takes in Stokes parameters as a list 
+    # def StokestoJonesTwo(self, S):
+    #     E = Jones_vector("Source 1")
+    #     print("is this even working")
+    #     stokes = Stokes().from_components(S)
+    #     self.jv = E.from_Stokes(stokes)
+    #     print(self.jv)
+    #     # return self.jv

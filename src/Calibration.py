@@ -10,8 +10,9 @@ import matplotlib.pyplot as plt
 #redundancy 
 class calibration(Polarimeter):
     def __init__(self):
-        super().__init__(14,14,14,11400540)
+        super().__init__(14,11400938,14,11400540)
         super().InitializeHardware()
+        pass
     
     def polarizerCalibrationModel(self, alpha, delta, constant, beta):
         return (constant*(np.cos(alpha - delta)**2)) + beta
@@ -23,7 +24,7 @@ class calibration(Polarimeter):
         self.measurementParameters(180,"pol")
         self.analyzePolData(10)
         positions1 , voltages1 = self.takeData()
-        input("Press en2ter when you are ready")
+        input("Press enter when you are ready")
         positions2 , voltages2 = self.takeData()
 
     def polarizereCalibration(self):
@@ -111,12 +112,12 @@ class calibration(Polarimeter):
 
     def measurementParameters(self, optic):
         if optic == "pol":
-            # self.data_points = 200
-            self.data_points = int(input("enter data points: "))
+            self.data_points = 200
+            # self.data_points = int(input("enter data points: "))
             self.rotation_interval = 180/self.data_points
         if optic == "qwp":
-            # self.data_points = 100
-            self.data_points = int(input("enter data points: "))
+            self.data_points = 100
+            # self.data_points = int(input("enter data points: "))
             self.rotation_interval = 90/self.data_points
         
 
@@ -128,5 +129,4 @@ if __name__ == "__main__":
     g = calibration()
     g.testfunction()
     # g.polarizereCalibration()
-
     g.qwpCalibration()
