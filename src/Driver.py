@@ -18,3 +18,8 @@ class driver(Polarimeter, PolarimeterAnalysis, plotting):
         self.Stokes = [self.S0, self.S1, self.S2, self.S3]
         self.jones_vector = self.stokes_to_jones(self.Stokes)
         self.Ex, self.Ey = self.jones_vector[0], self.jones_vector[1]
+
+if __name__ == "__main__":
+    driver = driver()
+    print(driver.load_qwp_calibration_angle())
+    print(driver.load_polarizer_calibration_angle())

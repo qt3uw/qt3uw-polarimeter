@@ -4,6 +4,8 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
+import pickle
+import os
 class PhotodiodeOversaturationError(Exception):
    pass
 class Polarimeter:
@@ -12,7 +14,8 @@ class Polarimeter:
       self.p_stage_serialnumber = pol_serial
       self.qwp_stage_model = qwp_stage 
       self.qwp_stage_serialnumber = qwp_serial   
-      self.qwp_calibrated_angle = 69.56795679567956
+      self.qwp_calibrated_angle = self.load_qwp_calibration_angle()
+      self.pol_calibrated_angle = self.load_polarizer_calibration_angle()
    
 
    def InitializeHardware(self):
@@ -228,6 +231,33 @@ class Polarimeter:
         plt.plot()
         plt.legend()
         plt.show()
+   
+   def save_polarizer_calibration_angle(self, pol_angle, file_path='polarizer_calibration_data.pkl'):
+       calibration_data = pol_angle
+       #  self.pol_stage.move_absolute(pol_angle)
+       with open(file_path, 'wb') as file:
+           pickle.dump(calibration_data, file)
+       print("polarizer calibration data has been saved")
+
+   def load_polarizer_calibration_angle(self, file_path='polarizer_calibration_data.pkl'):
+       if os.path.exists(file_path):
+           with open(file_path, 'rb') as file:
+               calibration_data = pickle.load(file)
+               return calibration_data
+   
+   def save_qwp_calibration_angle(self, qwp_angle, file_path = 'qwp_calibration_data.pkl'):
+       calibration_data = qwp_angle
+      #  self.qwp_stage.move_absolute(qwp_angle)
+       with open (file_path, 'wb') as file:
+           pickle.dump(calibration_data, file)
+       print("qwp calibration data has been saved")
+
+   def load_qwp_calibration_angle(self, file_path = 'qwp_calibration_data.pkl'):
+       if os.path.exists(file_path):
+           with open(file_path, 'rb') as file:
+               calibration_data = pickle.load(file)
+               return calibration_data
+   
    
    
 

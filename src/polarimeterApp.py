@@ -87,8 +87,8 @@ class PolarimeterApp:
 **Use the polarizer adjustment tool to move polarizer to update its calibrated angle**
 3. Add QWP + rotator mount back in front of polarizer mount and press start
 **Now you can use update angle button to update the qwp staring position**
-** Note, when you update either calibration it will be saved to 
-   a json file and will be the new default **
+** Note, when you update either calibration it will save over the last calibration
+in a pickle file and will be the new default **
 """)
         
         
@@ -97,8 +97,8 @@ class PolarimeterApp:
         buttons = [
             {'text': 'Polarizer Calibration', 'command': lambda: self.Driver.polarizereCalibration()},
             {'text': 'QWP Calibration', 'command': lambda: self.Driver.qwpCalibration()},
-            {'text': 'Update Polarizer Position', 'command': lambda: print('polarizer rotated')},
-            {'text': 'Update QWP Starting Position', 'command': lambda: print('qwp starting position adjusted')}
+            {'text': 'Update Polarizer Position', 'command': self.update_polarizer_position},
+            {'text': 'Update QWP Starting Position', 'command': self.update_qwp_position}
         ]
 
         for btn in buttons:
@@ -144,6 +144,56 @@ class PolarimeterApp:
     def print_user_input():
         global user_input
         print(f"user input: {user_input}")
+
+
+    def update_polarizer_position(self):
+        input_dialog = ctk.CTkToplevel(self.window)
+        input_dialog.title("Update Polarizer Position")
+        input_dialog.geometry("300x150")
+
+        label = ctk.CTkLabel(input_dialog, text="Enter new polarizer position:")
+        label.pack(pady=10)
+
+        entry = ctk.CTkEntry(input_dialog)
+        entry.pack(pady=5)
+
+        def on_submit():
+            try:
+                new_position = float(entry.get())  # Get user input as a float
+                self.Driver.save_polarizer_calibration_angle(new_position)  # Save the new position
+                self.Driver.pol_calibrated_angle = new_position
+                input_dialog.destroy()  
+            except ValueError:
+                print("Invalid input. Please enter a valid number.")
+
+        submit_button = ctk.CTkButton(input_dialog, text="Submit", command=on_submit)
+        submit_button.pack(pady=10)
+    
+
+    def update_qwp_position(self):
+        # Create a popup to get user input for QWP position
+        input_dialog = ctk.CTkToplevel(self.window)
+        input_dialog.title("Update QWP Starting Position")
+        input_dialog.geometry("300x150")
+
+        label = ctk.CTkLabel(input_dialog, text="Enter new QWP starting position:")
+        label.pack(pady=10)
+
+        entry = ctk.CTkEntry(input_dialog)
+        entry.pack(pady=5)
+
+        def on_submit():
+            try:
+                new_position = float(entry.get())  # Get user input as a float
+                self.Driver.save_qwp_calibration_angle(new_position)  # Save the new position
+                self.Driver.qwp_calibrated_angle = new_position  # Update the internal state
+                input_dialog.destroy()  # Close the dialog
+            except ValueError:
+                print("Invalid input. Please enter a valid number.")
+            
+
+        submit_button = ctk.CTkButton(input_dialog, text="Submit", command=on_submit)
+        submit_button.pack(pady=10)
 
 # Redirect class makes text print to gui
 class Redirect:
