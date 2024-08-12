@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.mplot3d import Axes3D
 
+# 3d animation
 class PolarimeterVisualization:
     def __init__(self, input_vector):
         self.input_vector = input_vector

@@ -11,31 +11,21 @@ class Polarimeter:
       self.p_stage_model = pol_stage
       self.p_stage_serialnumber = pol_serial
       self.qwp_stage_model = qwp_stage 
-      self.qwp_stage_serialnumber = qwp_serial
-      self.n_angles = 200
-      self.pstage = None
-      # self.redpitaya = scpi.scpi('128.95.31.27')
-      self.data = None
-      self.theta = 180/self.n_angles
-   
+      self.qwp_stage_serialnumber = qwp_serial   
+      self.qwp_calibrated_angle = 69.56795679567956
    
 
-   # Initializes hardware components to get ready for
-   # data acquisition, must run before running polarimeter
    def InitializeHardware(self):
       self.qwp_stage = ELLx(x = self.qwp_stage_model, device_serial = self.qwp_stage_serialnumber)
-      # self.pstage = ELLx(x = self.p_stage_model, device_serial = self.p_stage_serialnumber)
       self.qwp_stage.home()
-      # self.qwp_stage.move_relative(71.55565556555656, blocking = True)
-      self.qwp_stage.move_relative(69.56795679567956, blocking = True)
+      self.qwp_stage.move_absolute(self.qwp_calibrated_angle, blocking = True)
       self.redpitaya = scpi.scpi('128.95.31.27')
    
-   #  Parses, and Stores Data
-
+   
    def adjustPolarizermount(self, angle):
-      self.pol
+      pass
       
-
+   # Parses and stores raw data 
    def _formatRpData(self, raw_data):
       raw_data = raw_data.replace("{", " ").replace("}", "")
       raw_data = raw_data.replace("VOLTS\r\n ","         ")
@@ -51,39 +41,44 @@ class Polarimeter:
       
       return raw_data_list
 
+   # Data acquisition 
    def getData(self,theta):
       self.redpitaya.tx_txt('ACQ:RST')
       self.redpitaya.tx_txt('ACQ:DATA:UNITS VOLTS')
       self.redpitaya.tx_txt('ACQ:SOUR1:GAIN HV')
       self.redpitaya.tx_txt('ACQ:DEC 1')
       self.redpitaya.tx_txt('ACQ:START')
-      time.sleep(.2)
       self.redpitaya.tx_txt('ACQ:STOP')
       self.qwp_stage.move_relative(theta)
       self.raw_data = self.redpitaya.acq_data(1)
-      return self.raw_data
    
+   # Main driver code for polarimeter
    def runPolarimeter(self, n_angles):
       self.data = []
-      for i in range (n_angles):
+
+      for i in range (int(n_angles)):
          # data acquisition
-         self.getData(180/n_angles)
+         rotation_angle = 180/n_angles
+         self.getData(rotation_angle)
 
          # Formats data for processing
          data = self._formatRpData(self.raw_data)
+         
+         # checks for values above oversaturation
+         # threshold (10 Volts)
          for item in data:
             self.check_for_oversaturation(item)
-            
+         
+         # Takes average of data at respective angle
          data = np.average(data)
 
          self.data.append(data)
-      # self.qwp_stage.home(blocking=True)
-      time.sleep(0.2)
-      self.qwp_stage.home(blocking = True)
-      self.qwp_stage.move_absolute(71.556, blocking=True)
+      
+      
+      # Returns qwp back to calibrated position
+      time.sleep(0.2) # Timer helps reduce risk of mechanical timeout
+      self.qwp_stage.move_absolute(self.qwp_calibrated_angle, blocking=True)
    
-   def testfunction(self):
-      print("Your inheritance is working")
 
    def check_for_oversaturation(self,output_voltage):
       if output_voltage >= 10.0:
@@ -92,7 +87,7 @@ class Polarimeter:
    def MeasureLaserFluctuation(self):
       # Takes data at a fixed position 
       # and prints the range of fluctuation
-      # As a percentage
+      # as a percentage
       self.redpitaya.tx_txt('ACQ:RST')
       self.redpitaya.tx_txt('ACQ:DATA:UNITS VOLTS')
       self.redpitaya.tx_txt('ACQ:DEC 1')
@@ -116,41 +111,41 @@ class Polarimeter:
 
 
    #############################################################################
-   ########################   CALIBRATION STUFF   ##############################
+   ########################      CALIBRATION      ##############################
    #############################################################################
 
    def polarizerCalibrationModel(self, alpha, delta, constant, beta):
         return (constant*(np.cos(alpha - delta)**2)) + beta
     
+    
    def qwpCalibrationModel(self, alpha, omega, beta, chi, delta):
         return omega * np.cos((2*alpha - beta) + delta)**2 + chi
 
-   def polarizerCalibrationNoCube(self):
-        self.measurementParameters(180,"pol")
-        self.analyzePolData(10)
-        positions1 , voltages1 = self.takeData()
-        input("Press enter when you are ready")
-        positions2 , voltages2 = self.takeData()
 
    def polarizereCalibration(self):
         self.measurementParameters("pol")
-        self.takeData()
+        self.takeCalibrationData()
         self.analyzePolData()
+
     
    def qwpCalibration(self):
         self.measurementParameters("qwp")
-        self.takeData()
+        self.takeCalibrationData()
         self.analyzeQwpData()
-        
+   
+
+   def measurementParameters(self, optic):
+        if optic == "pol":
+            self.data_points = 200
+            # self.data_points = int(input("enter data points: "))
+            self.rotation_interval = 180/self.data_points
+        if optic == "qwp":
+            self.data_points = 100
+            # self.data_points = int(input("enter data points: "))
+            self.rotation_interval = 90/self.data_points
 
 
-
-
-   def testfunction(self):
-        print("no errors!!!")
-
-
-   def takeData(self):
+   def takeCalibrationData(self):
         self.Voltages = []
         self.actual_positions = []
         for _ in range(self.data_points):
@@ -161,20 +156,21 @@ class Polarimeter:
             self.Voltages.append(data)
         return self.actual_positions, self.Voltages
     
-####### DRIVER #######
+
    def analyzePolData(self):
         popt, pcov = curve_fit(self.polarizerCalibrationModel, np.deg2rad(self.actual_positions), self.Voltages)
         optimized_delta, optimized_constant, optimized_beta = popt
-        cov_constant, cov_delta, cov_beta = np.sqrt(np.diag(pcov))
+      
+      #   cov_constant, cov_delta, cov_beta = np.sqrt(np.diag(pcov))
 
-        # table_text = f"""
-        # Optimized Parameters:
-        # Constant: {optimized_constant:.2e} ± {cov_constant:.2e}
-        # Delta: {optimized_delta:.2e} ± {cov_delta:.2e}
-        # Beta: {optimized_beta:.2e} ± {cov_beta:.2e}
-        # """
-        # plt.text(0.5, 1.075 ,table_text,transform=plt.gca().transAxes, fontsize=6,
-        #     verticalalignment='center', bbox=dict(boxstyle="round,pad=0.2", edgecolor='black', facecolor='white'))
+      #   table_text = f"""
+      #   Optimized Parameters:
+      #   Constant: {optimized_constant:.2e} ± {cov_constant:.2e}
+      #   Delta: {optimized_delta:.2e} ± {cov_delta:.2e}
+      #   Beta: {optimized_beta:.2e} ± {cov_beta:.2e}
+      #   """
+      #   plt.text(0.5, 1.075 ,table_text,transform=plt.gca().transAxes, fontsize=6,
+      #       verticalalignment='center', bbox=dict(boxstyle="round,pad=0.2", edgecolor='black', facecolor='white'))
 
 
         model_angles = np.deg2rad(np.linspace(0,180,10000))
@@ -188,7 +184,7 @@ class Polarimeter:
 
         max_index = np.argmax(model_values)
         max_angle = model_angles[max_index] 
-        print(np.rad2deg(max_angle))
+        print(f"Calibrated angle: {np.rad2deg(max_angle):.3f}")
 
      
    def analyzeQwpData(self): 
@@ -210,15 +206,7 @@ class Polarimeter:
         plt.legend()
         plt.show()
    
-   def measurementParameters(self, optic):
-        if optic == "pol":
-            self.data_points = 200
-            # self.data_points = int(input("enter data points: "))
-            self.rotation_interval = 180/self.data_points
-        if optic == "qwp":
-            self.data_points = 100
-            # self.data_points = int(input("enter data points: "))
-            self.rotation_interval = 90/self.data_points
+   
 
            
    

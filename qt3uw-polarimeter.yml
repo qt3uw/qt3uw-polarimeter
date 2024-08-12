@@ -12,6 +12,4 @@ dependencies:
   - pip
   - pip:
     - customtkinter
-    - Pillow
-    - tkinter
     - thorlabs-elliptec
