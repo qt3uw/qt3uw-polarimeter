@@ -16,9 +16,19 @@ class Polarimeter:
    
 
    def InitializeHardware(self):
-      self.qwp_stage = ELLx(x = self.qwp_stage_model, device_serial = self.qwp_stage_serialnumber)
-      self.qwp_stage.home()
-      self.qwp_stage.move_absolute(self.qwp_calibrated_angle, blocking = True)
+      try:
+          self.qwp_stage = ELLx(x = self.qwp_stage_model, device_serial = self.qwp_stage_serialnumber)
+          self.qwp_stage.home()
+          self.qwp_stage.move_absolute(self.qwp_calibrated_angle, blocking = True)
+      except Exception as e:
+          print(f"qwp mount failed to connect: {e}")
+      
+      try: 
+          self.pol_stage = ELLx(x = self.p_stage_model, device_serial= self.p_stage_serialnumber)
+      except Exception as e:
+          print(f"polarizer mount failed to connect: {e}")
+
+   
       self.redpitaya = scpi.scpi('128.95.31.27')
    
    
@@ -42,14 +52,22 @@ class Polarimeter:
       return raw_data_list
 
    # Data acquisition 
-   def getData(self,theta):
+   def getData(self,theta, type = None):
+      
+      if type is not None:
+            mount = self.pol_stage
+      
+      else:
+          mount = self.qwp_stage
+
       self.redpitaya.tx_txt('ACQ:RST')
       self.redpitaya.tx_txt('ACQ:DATA:UNITS VOLTS')
       self.redpitaya.tx_txt('ACQ:SOUR1:GAIN HV')
       self.redpitaya.tx_txt('ACQ:DEC 1')
       self.redpitaya.tx_txt('ACQ:START')
       self.redpitaya.tx_txt('ACQ:STOP')
-      self.qwp_stage.move_relative(theta)
+      
+      mount.move_relative(theta)
       self.raw_data = self.redpitaya.acq_data(1)
    
    # Main driver code for polarimeter
@@ -124,7 +142,7 @@ class Polarimeter:
 
    def polarizereCalibration(self):
         self.measurementParameters("pol")
-        self.takeCalibrationData()
+        self.takeCalibrationData("pol")
         self.analyzePolData()
 
     
@@ -136,22 +154,27 @@ class Polarimeter:
 
    def measurementParameters(self, optic):
         if optic == "pol":
-            self.data_points = 200
+            self.data_points = 300
             # self.data_points = int(input("enter data points: "))
             self.rotation_interval = 180/self.data_points
         if optic == "qwp":
-            self.data_points = 100
+            self.data_points = 200
             # self.data_points = int(input("enter data points: "))
             self.rotation_interval = 90/self.data_points
 
 
-   def takeCalibrationData(self):
+   def takeCalibrationData(self, type = None):
         self.Voltages = []
         self.actual_positions = []
         for _ in range(self.data_points):
-            self.actual_positions.append(self.qwp_stage.get_position())
-            raw_data = self.getData(self.rotation_interval)
-            data = self._formatRpData(raw_data)
+            
+            if type is not None:
+               self.actual_positions.append(self.pol_stage.get_position())
+               self.getData(self.rotation_interval, type)
+            else:
+                self.actual_positions.append(self.qwp_stage.get_position())
+                self.getData(self.rotation_interval)
+            data = self._formatRpData(self.raw_data)
             data = np.average(data)
             self.Voltages.append(data)
         return self.actual_positions, self.Voltages

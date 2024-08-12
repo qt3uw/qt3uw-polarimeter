@@ -47,8 +47,8 @@ class PolarimeterApp:
         calib_window.title("Calibration Instructions")
         calib_window.geometry("800x500")
 
-        self.instructions_frame = ctk.CTkFrame(calib_window)
-        self.instructions_frame.pack(pady=20, padx=20, fill='x', expand=True, anchor="n")
+        self.instructions_frame = ctk.CTkScrollableFrame(calib_window)
+        self.instructions_frame.pack(pady=20, padx=20, fill='both', expand=True, anchor="n")
 
 
         # Calibration buttons
@@ -71,7 +71,6 @@ class PolarimeterApp:
 
         self.plot_frame.pack(anchor = 'ne')
 
-    
 
     def setup_widget_frame(self):
         self.widget_frame = ctk.CTkScrollableFrame(self.window, width=250, height=500)
@@ -80,14 +79,26 @@ class PolarimeterApp:
         self.setup_main_buttons()
     
     def setup_calibration_buttons(self):
-        instructions_label = ctk.CTkLabel(self.instructions_frame, font=("Helvetica", 12), text="CALIBRATION INSTRUCTIONS\n1. Mount horizontally aligned beam splitter or polarizer in front of laser\n2. Leave only Rotator Mount with Polarizer on System then click begin\n**After each run it will give the calibrated angle.**\nUse the polarizer\nadjustment tool to move polarizer to the calibrated angle then leave it there**\n3.Add QWP + rotator mount back and press start\n**Now you can either hardcode this value into\nthe update angle button to update this value**")
+        instructions_label = ctk.CTkLabel(self.instructions_frame, font=("Helvetica", 12), 
+                                          text="""CALIBRATION INSTRUCTIONS 
+1. Mount horizontally aligned beam splitter or polarizer in front of laser 
+2. Leave only Polarizer mounted then click to begin
+**After each run it will print the calibrated angle in the original window.**
+**Use the polarizer adjustment tool to move polarizer to update its calibrated angle**
+3. Add QWP + rotator mount back in front of polarizer mount and press start
+**Now you can use update angle button to update the qwp staring position**
+** Note, when you update either calibration it will be saved to 
+   a json file and will be the new default **
+""")
+        
+        
         instructions_label.pack(pady=10, anchor="n")
 
         buttons = [
-            {'text': 'Polarizer Calibrate', 'command': lambda: print('polarizer calibration')},
-            {'text': 'QWP Calibrate', 'command': lambda: print('QWP calibration')},
-            {'text': 'Adjust Polarizer Position', 'command': lambda: print('polarizer rotated')},
-            {'text': 'QWP Cali Adjust', 'command': lambda: print('qwp starting position adjusted')}
+            {'text': 'Polarizer Calibration', 'command': lambda: self.Driver.polarizereCalibration()},
+            {'text': 'QWP Calibration', 'command': lambda: self.Driver.qwpCalibration()},
+            {'text': 'Update Polarizer Position', 'command': lambda: print('polarizer rotated')},
+            {'text': 'Update QWP Starting Position', 'command': lambda: print('qwp starting position adjusted')}
         ]
 
         for btn in buttons:

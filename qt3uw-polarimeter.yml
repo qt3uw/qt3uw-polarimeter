@@ -13,3 +13,4 @@ dependencies:
   - pip:
     - customtkinter
     - thorlabs-elliptec
+    - pyserial

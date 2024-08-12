@@ -8,7 +8,7 @@ class driver(Polarimeter, PolarimeterAnalysis, plotting):
         Polarimeter.__init__(self,14,11400938,14,11400540)
         PolarimeterAnalysis.__init__(self)
         plotting.__init__(self)
-        
+
     # Drives the polarimeter, collects data, formats, analyzes,
     # and creates jone vector 
     def main(self):
