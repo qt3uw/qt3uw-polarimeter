@@ -206,11 +206,11 @@ class Polarimeter:
 
     def measurementParameters(self, optic):
         if optic == "pol":
-            self.data_points = 200
+            self.data_points = 250
             # self.data_points = int(input("enter data points: "))
             self.rotation_interval = 180/self.data_points
         if optic == "qwp":
-            self.data_points = 100
+            self.data_points = 175
             # self.data_points = int(input("enter data points: "))
             self.rotation_interval = 90/self.data_points
 
