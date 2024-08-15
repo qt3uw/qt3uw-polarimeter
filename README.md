@@ -1,5 +1,5 @@
-# qt3uw-polarimeter
-## Introduction:
+# __qt3uw-polarimeter__
+## __Introduction__:
 This project is designed to measure and analyze the polarization state of a coherant light source entering the system (i.e a laser). Using a combination of hardware control, and data acquisition components, this system allows for calibration and real-time measurements of Polarization.
 
 ###   Key Features: 
@@ -12,3 +12,43 @@ This project is designed to measure and analyze the polarization state of a cohe
  * __Visualization__: The interface provides a plotting feature to visualize the polarization state over time, allowing for multiple plots at once combined with a greyscale feature to denote newer data
 
 This project is ideal for researchers and engineers working in optical expirementation requiring a solution for a polarimeter measurement and calibration of lasers
+
+## __Hardware Setup__
+
+#### Components
+_Thorlabs_
+*  1x L202 Laser 635nm
+*  1x PDA36A2 PhotoDiode
+*  2x Ell14K Mount Bundle
+*  1x WP25M-VIS Wire Grid Polarizer 420-700nm
+*  1x AQWP05M-600 Quarter-Wave Plate 400-800nm
+*  Mounting Components
+
+_Red Pitaya_
+*  125-10 FGPA
+
+_Miscallaneous_
+*  3x USB to MicroUSB Data Cables
+*  3x Ethernet Cables
+*  1x Ethernet Switch
+*  1x Polarizing Beam Splitter Cube (for calibration)
+*  COAX BNC Cable
+*  BNC Adapter
+
+
+
+## Configuration
+
+There a few parameters that are easy to change manually that are not able to be manipulated through the GUI. 
+
+Driver.py ---- > def main() ---- > number_of_increments
+
+Changing this value changes the number of steps that power is measured as the quarter wave plate is rotated. There is a tradeoff between speed and accuracy. Depending on your needs, this can and should be changed. The most that I used with great accuracy was 120. Minimum for the algorithms to function, but not reccommended, is 8 steps. 
+
+###Calibration:
+For the first step of calibration, ensure that you only have the polarizer,
+
+
+
+
+
