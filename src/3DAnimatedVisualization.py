@@ -24,7 +24,8 @@ class PolarimeterVisualization:
 
         self.z = None
         self.eField = None
-
+        self.pointSetup()
+        self.plotSetup()
     
     def pointSetup(self):
         self.fontsize = 18
@@ -92,6 +93,13 @@ class PolarimeterVisualization:
     def animate(self):
         ani = FuncAnimation(self.fig, self.update, interval = 1000 / self.FPS, frames = enumerate(np.arange(self.totalPoints - self.pointsPerview -1, 0, -1)), repeat = True, blit = False, cache_frame_data = False)
         plt.show()
+    
+
+if __name__ == "__main__":
+    input_vector = [1,1j]
+    pv = PolarimeterVisualization(input_vector)
+    pv.animate()
+
 
         
 
