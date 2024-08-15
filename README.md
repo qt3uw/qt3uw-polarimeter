@@ -35,6 +35,7 @@ _Miscallaneous_
 *  COAX BNC Cable
 *  BNC Adapter
 
+## __Usage__
 
 
 ## Configuration
@@ -45,10 +46,16 @@ Driver.py ---- > def main() ---- > number_of_increments
 
 Changing this value changes the number of steps that power is measured as the quarter wave plate is rotated. There is a tradeoff between speed and accuracy. Depending on your needs, this can and should be changed. The most that I used with great accuracy was 120. Minimum for the algorithms to function, but not reccommended, is 8 steps. 
 
-###Calibration:
+###  Calibration:
 For the first step of calibration, ensure that you only have the polarizer,
 
+##  Troubleshooting
 
+
+##  Credits
+
+
+##  License
 
 
 
