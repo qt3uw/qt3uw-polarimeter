@@ -28,7 +28,8 @@ class scpi (object):
             self._socket.connect((host, port))
 
         except socket.error as e:
-            print('SCPI >> connect({!s:s}:{:d}) failed: {!s:s}'.format(host, port, e))
+            # print('SCPI >> connect({!s:s}:{:d}) failed: {!s:s}'.format(host, port, e))
+            raise
 
     def __del__(self):
         if self._socket is not None:

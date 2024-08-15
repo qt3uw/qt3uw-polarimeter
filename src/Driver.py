@@ -21,5 +21,5 @@ class driver(Polarimeter, PolarimeterAnalysis, plotting):
 
 if __name__ == "__main__":
     driver = driver()
-    print(driver.load_qwp_calibration_angle())
-    print(driver.load_polarizer_calibration_angle())
+    print(f"qwp angle: {driver.load_qwp_calibration_angle()}")
+    print(f"polarizer angle: {driver.load_polarizer_calibration_angle()}")

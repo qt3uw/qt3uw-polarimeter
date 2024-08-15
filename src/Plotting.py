@@ -36,6 +36,12 @@ class plotting:
         new_line, = self.ax.plot(Ex, Ey, lw=2, color='black')
         self.lines.append(new_line)
 
+        # arrow_start_index = len(Ex) // 4  # Start point for the arrow
+        # arrow_end_index = len(Ex) // 4 + 10  # End point for the arrow
+        # self.ax.annotate('', xy=(Ex[arrow_end_index], Ey[arrow_end_index]), 
+        #                  xytext=(Ex[arrow_start_index], Ey[arrow_start_index]),
+        #                  arrowprops=dict(facecolor='blue', shrink=0.05))
+
         self.fig.canvas.draw_idle()
     
     # Plots average components of all lines

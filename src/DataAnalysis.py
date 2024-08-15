@@ -12,15 +12,15 @@ class PolarimeterAnalysis:
     def extract_stokes(self, input_data, number_of_angles):
         
         # creates corresponding array of angles with
-        # respect to number of angles input
+        #
+        #  respect to number of angles input
         angles = np.deg2rad(np.linspace(0,180 - 180/number_of_angles, number_of_angles))
-        data_length = len(input_data)
         
         # Fourier Coefficients Computation 
-        A = (2/data_length) * np.sum(input_data)
-        B = (4/data_length) * np.sum(input_data * np.sin(2 * angles))
-        C = (4/data_length) * np.sum(input_data * np.cos(4 * angles))
-        D = (4/data_length) * np.sum(input_data * np.sin(4 * angles))
+        A = (2/number_of_angles) * np.sum(input_data)
+        B = (4/number_of_angles) * np.sum(input_data * np.sin(2 * angles))
+        C = (4/number_of_angles) * np.sum(input_data * np.cos(4 * angles))
+        D = (4/number_of_angles) * np.sum(input_data * np.sin(4 * angles))
 
         # Stoke Parameter Computation
         self.S0 = A - C

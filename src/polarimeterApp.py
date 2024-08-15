@@ -7,9 +7,11 @@ import Driver
 class PolarimeterApp:
     def __init__(self):
         self.Driver = Driver.driver()
+        self.after_ids = []
         
         # sets up window and plot frame
         self.window = ctk.CTk() 
+        self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.setup_plot_frame()
         
         # basic window parameters
@@ -95,10 +97,11 @@ in a pickle file and will be the new default **
         instructions_label.pack(pady=10, anchor="n")
 
         buttons = [
-            {'text': 'Polarizer Calibration', 'command': lambda: self.Driver.polarizereCalibration()},
+            {'text': 'Polarizer Calibration', 'command': lambda: self.Driver.polarizerCalibration()},
             {'text': 'QWP Calibration', 'command': lambda: self.Driver.qwpCalibration()},
-            {'text': 'Update Polarizer Position', 'command': self.update_polarizer_position},
-            {'text': 'Update QWP Starting Position', 'command': self.update_qwp_position}
+            {'text': 'Home Polarizer', 'command': lambda: self.Driver.home_polarizer()},
+            {'text': 'Home QWP', 'command': lambda: self.Driver.home_qwp()},
+            {'text': 'Print Current Calibration Angles', 'command': lambda: self.Driver.print_calibration_angles()}
         ]
 
         for btn in buttons:
@@ -121,12 +124,12 @@ in a pickle file and will be the new default **
 
         buttons = [
             {'text': 'Initialize Hardware', 'command': lambda: self.Driver.InitializeHardware()},
-            {'text': 'Collect Data', 'command': lambda: self.Driver.main()},
+            {'text': 'Run Polarimeter', 'command': lambda: self.Driver.main()},
             {'text': 'Update Plot', 'command': lambda: self.Driver.update_plot(self.Driver.Ex, self.Driver.Ey)},
             {'text': 'Average Plot', 'command': lambda: self.Driver.average_plot()},
             {'text': 'Clear Plot', 'command': lambda: self.Driver.clear_plot()},
             {'text': 'Clear Text', 'command': lambda: self.clear_text()},
-            {'text': 'Calibration', 'command': self.open_calibration_window}
+            {'text': 'Calibration Menu', 'command': self.open_calibration_window}
         ]
 
         for btn in buttons:
@@ -139,61 +142,24 @@ in a pickle file and will be the new default **
                                    corner_radius=50, 
                                    command=btn['command'])
             button.pack(pady=15)
+        
+        
+    def on_closing(self):
+    # Cancel all pending after callbacks
+        try:
+            for after_id in self.after_ids:
+                self.window.after_cancel(after_id)
+        except Exception as e:
+            print(f"Error canceling after_id: {e}")
 
-    # place holder function
-    def print_user_input():
-        global user_input
-        print(f"user input: {user_input}")
+        # Attempt to cancel any remaining after callbacks
+        try:
+            self.window.quit()
+            self.window.update_idletasks()
+        except Exception as e:
+            print(f"Error during quit/update_idletasks: {e}")
 
-
-    def update_polarizer_position(self):
-        input_dialog = ctk.CTkToplevel(self.window)
-        input_dialog.title("Update Polarizer Position")
-        input_dialog.geometry("300x150")
-
-        label = ctk.CTkLabel(input_dialog, text="Enter new polarizer position:")
-        label.pack(pady=10)
-
-        entry = ctk.CTkEntry(input_dialog)
-        entry.pack(pady=5)
-
-        def on_submit():
-            try:
-                new_position = float(entry.get())  # Get user input as a float
-                self.Driver.save_polarizer_calibration_angle(new_position)  # Save the new position
-                self.Driver.pol_calibrated_angle = new_position
-                input_dialog.destroy()  
-            except ValueError:
-                print("Invalid input. Please enter a valid number.")
-
-        submit_button = ctk.CTkButton(input_dialog, text="Submit", command=on_submit)
-        submit_button.pack(pady=10)
-    
-
-    def update_qwp_position(self):
-        # Create a popup to get user input for QWP position
-        input_dialog = ctk.CTkToplevel(self.window)
-        input_dialog.title("Update QWP Starting Position")
-        input_dialog.geometry("300x150")
-
-        label = ctk.CTkLabel(input_dialog, text="Enter new QWP starting position:")
-        label.pack(pady=10)
-
-        entry = ctk.CTkEntry(input_dialog)
-        entry.pack(pady=5)
-
-        def on_submit():
-            try:
-                new_position = float(entry.get())  # Get user input as a float
-                self.Driver.save_qwp_calibration_angle(new_position)  # Save the new position
-                self.Driver.qwp_calibrated_angle = new_position  # Update the internal state
-                input_dialog.destroy()  # Close the dialog
-            except ValueError:
-                print("Invalid input. Please enter a valid number.")
-            
-
-        submit_button = ctk.CTkButton(input_dialog, text="Submit", command=on_submit)
-        submit_button.pack(pady=10)
+        self.window.destroy()
 
 # Redirect class makes text print to gui
 class Redirect:
