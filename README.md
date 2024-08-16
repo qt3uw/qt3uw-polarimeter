@@ -35,27 +35,12 @@ _Miscallaneous_
 *  COAX BNC Cable
 *  BNC Adapter
 
-## __Usage__
-
-
 ## Configuration
 
-There a few parameters that are easy to change manually that are not able to be manipulated through the GUI. 
 
 Driver.py ---- > def main() ---- > number_of_increments
 
 Changing this value changes the number of steps that power is measured as the quarter wave plate is rotated. There is a tradeoff between speed and accuracy. Depending on your needs, this can and should be changed. The most that I used with great accuracy was 120. Minimum for the algorithms to function, but not reccommended, is 8 steps. 
 
 ###  Calibration:
-For the first step of calibration, ensure that you only have the polarizer,
-
-##  Troubleshooting
-
-
-##  Credits
-
-
-##  License
-
-
-
+For the first step of calibration, ensure that you only have the polarizer + your calibrating polarizer element, we used a beam slitter cube. The purpose of this calibration is to align the mounted optics axis horizontally. For the second step, reintroduce the quarter wave plate in between the calibration element and the mounted polarizer. After going through these steps in the GUI it your optics will be properly calibrated and the data should be saved for future use. 
