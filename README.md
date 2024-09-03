@@ -37,6 +37,9 @@ _Miscallaneous_
 
 ## Configuration
 
+### Dependencies:
+One can manually install dependencies using pip or using conda. To use conda, cd into the repo directory and run "conda env create -f qt3uw-polarimeter.yml". This will create a virtual environment with the name "qt3uw-polarimeter". To work in this environment open the conda command line and run conda activate qt3uw-polarimeter. 
+
 
 Driver.py ---- > def main() ---- > number_of_increments
 
@@ -44,3 +47,18 @@ Changing this value changes the number of steps that power is measured as the qu
 
 ###  Calibration:
 For the first step of calibration, ensure that you only have the polarizer + your calibrating polarizer element, we used a beam slitter cube. The purpose of this calibration is to align the mounted optics axis horizontally. For the second step, reintroduce the quarter wave plate in between the calibration element and the mounted polarizer. After going through these steps in the GUI it your optics will be properly calibrated and the data should be saved for future use. 
+
+## Usage:
+Ensure there is a wired ethernet connection between your computer, RP board, and an internet connection. Both rotator mounts + laser should be connected via USB to your computer as well.  
+
+The FPGA board needs to have its Scpi server activated to work with its API. Once physical connection has been established, visit rp-f071c2.local (rp-last six digits of mac address) and manually activate tbe SCPI server.
+
+After, run the PolarimeterApp.py file from within the repo folder and use the system with the user interface that will open. 
+
+### Troubleshooting:
+
+### Computations: 
+
+## References: 
+
+## 
