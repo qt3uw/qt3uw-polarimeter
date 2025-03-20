@@ -1,0 +1,8 @@
+python>3.11
+numpy
+matplotlib
+scipy
+pip
+customtkinter
+thorlabs-elliptec
+pyserial
