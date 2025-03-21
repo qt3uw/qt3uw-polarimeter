@@ -6,4 +6,3 @@ customtkinter
 thorlabs-elliptec
 pyserial
 py_pol
-python.app
